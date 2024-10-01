@@ -20,12 +20,40 @@
         </button>
       </div>
 
-      <ul class="flex flex-col my-5">
+      <ul class="flex flex-col my-5 justify-around">
         <li
-          class="justify-items-centere my-4"
-          v-for="todo of todoStore.todoList"
+          class="justify-items-center my-4 border"
+          v-for="(todo, index) of todoStore.todoList"
         >
-          {{ todo.content }}
+          <div
+            v-if="!todo.editMode"
+            @click="updateTodo(todo.id!, { done: !todo.done })"
+          >
+            <span class="mx-4">{{ todo.content }}</span>
+
+            <button
+              class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 mx-3"
+              @click.stop="updateTodo(todo.id!, { editMode: true })"
+            >
+              Modifier
+            </button>
+            <input type="checkbox" :checked="todo.done" />
+            <button
+              class="bg-red-500 hover:bg-red-600 text-white p-3 mx-3"
+              @click.stop="deleteTodo(todo.id!)"
+            >
+              Suprimer
+            </button>
+          </div>
+          <div v-else>
+            <TodoForm
+              :content="todo.content"
+              @cancel="updateTodo(todo.id!, { editMode: false })"
+              @update="
+                updateTodo(todo.id!, { editMode: false, content: $event })
+              "
+            />
+          </div>
         </li>
       </ul>
     </div>
@@ -33,10 +61,13 @@
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-import { TodoState, useTodos } from "./stores/todoStore";
+import { TodoState, useTodos } from "./shared/stores/todoStore";
+import { Todo } from "./shared/interfaces/todo.interface";
+import TodoForm from "./components/TodoForm.vue";
 
 const input = ref<string>();
 const todoStore = useTodos();
+todoStore.fetchTodo();
 console.log(todoStore.todos);
 
 console.log("les getters", todoStore.todoList);
@@ -60,5 +91,17 @@ function Ajouter() {
 
   todoStore.addTdodo(input.value as string);
   input.value = "";
+}
+
+function deleteTodo(index: number) {
+  todoStore.deteteTodo(index);
+}
+
+function toggleTodo(index: number) {
+  todoStore.toggleTodo(index);
+}
+
+function updateTodo(index: number, todo_update: Partial<Todo>) {
+  todoStore.editeUpateTodo(index, todo_update);
 }
 </script>
