@@ -1,8 +1,15 @@
 <template>
   <div class="h-screen container">
     <div class="p-4 grid justify-items-center bg-slate-300">
-      <h1 class="font-bold text-3xl mb-8">Todo List App</h1>
+      <div class="container justify-items-center mb-5">
+        <h1 class="font-bold text-3xl mb-8">Todo List App</h1>
 
+        <select v-model="todoStore.filter" @change="updateFilter($event)">
+          <option value="all">ALL</option>
+          <option value="done">Fini</option>
+          <oDption value="ongoing">En cours</oDption>
+        </select>
+      </div>
       <div class="flex flex-row">
         <div>
           <input
@@ -64,6 +71,7 @@ import { ref } from "vue";
 import { TodoState, useTodos } from "./shared/stores/todoStore";
 import { Todo } from "./shared/interfaces/todo.interface";
 import TodoForm from "./components/TodoForm.vue";
+import { Filter } from "./shared/types";
 
 const input = ref<string>();
 const todoStore = useTodos();
@@ -81,20 +89,16 @@ const todos = todoStore.todoList;
 // }
 
 function Ajouter() {
-  // todoStore.$patch((state: TodoState)=>{
-  //   state.todos.push({
-  //     content: input.value,
-  //     done: false
-  //   })
-  // })
-  // input.value=''
-
-  todoStore.addTdodo(input.value as string);
+  todoStore.addTodo(input.value as string);
   input.value = "";
+}
+function updateFilter(event: any) {
+  const target = event.target as HTMLSelectElement;
+  todoStore.updateFilter(target.value as Filter);
 }
 
 function deleteTodo(index: number) {
-  todoStore.deteteTodo(index);
+  todoStore.deleteTodo(index);
 }
 
 function toggleTodo(index: number) {
@@ -102,6 +106,6 @@ function toggleTodo(index: number) {
 }
 
 function updateTodo(index: number, todo_update: Partial<Todo>) {
-  todoStore.editeUpateTodo(index, todo_update);
+  todoStore.editUpdateTodo(index, todo_update);
 }
 </script>
